@@ -12,6 +12,6 @@ public class OpenApiConfig {
         return new OpenAPI()
                 .info(new Info().title("Accounts and Transactions API")
                 .version("1.0.0")
-                .description("Accounts and Transactions API (09.2022 spec)"));
+                .description("Pismo Code Assessment"));
     }
 }
