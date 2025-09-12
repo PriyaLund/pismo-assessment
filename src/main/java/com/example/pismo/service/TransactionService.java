@@ -42,8 +42,7 @@ public class TransactionService {
                 tx.getId(),
                 account.getId(),
                 tx.getOperationTypeId(),
-                tx.getAmount(),
-                tx.getEventDate()
+                tx.getAmount()
         );
     }
 
