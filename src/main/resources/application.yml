@@ -1,7 +1,3 @@
-app:
-  security:
-    user: api
-    password: ${API_PASSWORD:pismo123}  # override with env var in prod
 spring:
   jackson:
     property-naming-strategy: SNAKE_CASE

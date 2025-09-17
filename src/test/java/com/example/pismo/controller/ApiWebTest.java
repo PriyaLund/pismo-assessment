@@ -8,9 +8,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.math.BigDecimal;
@@ -25,15 +27,18 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
 class ApiWebTest {
 
     @Autowired MockMvc mockMvc;
     @Autowired ObjectMapper om;
     @Autowired AccountRepository accountRepo;
 
-    // Basic auth credentials (from SecurityConfig / application.yml)
-    private final String USER = "api";
-    private final String PASSWORD = "pismo123";
+    // Basic auth credentials (from SecurityConfig / application-test.yml)
+    @Value("${app.security.user}")
+     String USER;
+    @Value("${app.security.password}")
+     String PASSWORD;
 
     @Test
     @DisplayName("Given a valid document number, when creating an account, then response has id + document_number only")

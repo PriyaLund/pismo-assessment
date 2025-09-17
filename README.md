@@ -16,7 +16,7 @@ This project implements the **Pismo coding assessment **
 
 ```bash
 mvn clean package
-java -jar target/pismo-spec-aligned-1.0.0.jar
+java -jar target/pismo-assessment-1.0.0.jar
 ```
 
 Server runs at: [http://localhost:8080](http://localhost:8080)

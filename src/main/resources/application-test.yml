@@ -1,0 +1,4 @@
+app:
+  security:
+    user: ${API_USER:api}
+    password: ${API_PASSWORD:pismo123}
