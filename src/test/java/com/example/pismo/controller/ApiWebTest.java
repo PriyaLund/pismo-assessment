@@ -20,6 +20,8 @@ import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
+
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -29,6 +31,10 @@ class ApiWebTest {
     @Autowired ObjectMapper om;
     @Autowired AccountRepository accountRepo;
 
+    // Basic auth credentials (from SecurityConfig / application.yml)
+    private final String USER = "api";
+    private final String PASSWORD = "pismo123";
+
     @Test
     @DisplayName("Given a valid document number, when creating an account, then response has id + document_number only")
     void givenValidDocument_whenCreateAccount_thenReturnsMinimalAccount() throws Exception {
@@ -37,6 +43,7 @@ class ApiWebTest {
 
         // When / Then
         mockMvc.perform(post("/accounts")
+                        .with(httpBasic(USER, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(req)))
                 .andExpect(status().isCreated())
@@ -53,7 +60,8 @@ class ApiWebTest {
         long accountId = createAccount("55544433322");
 
         // When / Then
-        mockMvc.perform(get("/accounts/{id}", accountId))
+        mockMvc.perform(get("/accounts/{id}", accountId).with(httpBasic(USER, PASSWORD)))
+
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.account_id").value(accountId))
                 .andExpect(jsonPath("$.document_number", is("55544433322")))
@@ -72,6 +80,7 @@ class ApiWebTest {
 
         // When: PURCHASE 50.00 -> amount stored negative; balance -> -50.00 (DB-only)
         mockMvc.perform(post("/transactions")
+                        .with(httpBasic(USER, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(String.format("{\"account_id\":%d,\"operation_type_id\":1,\"amount\":50.00}", accountId)))
                 .andExpect(status().isCreated())
@@ -84,6 +93,7 @@ class ApiWebTest {
 
         // When: PAYMENT 60.00 -> amount positive; balance -> 10.00 (DB-only)
         mockMvc.perform(post("/transactions")
+                        .with(httpBasic(USER, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(String.format("{\"account_id\":%d,\"operation_type_id\":4,\"amount\":60.00}", accountId)))
                 .andExpect(status().isCreated())
@@ -99,6 +109,7 @@ class ApiWebTest {
 
     private long createAccount(String documentNumber) throws Exception {
         var res = mockMvc.perform(post("/accounts")
+                        .with(httpBasic(USER, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(om.writeValueAsString(new AccountCreateRequest(documentNumber))))
                 .andExpect(status().isCreated())
