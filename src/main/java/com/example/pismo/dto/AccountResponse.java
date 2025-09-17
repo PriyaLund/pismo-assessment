@@ -8,5 +8,7 @@ import java.math.BigDecimal;
 @JsonNaming(PropertyNamingStrategies.SnakeCaseStrategy.class)
 public record AccountResponse(
         Long accountId,
-        String documentNumber
+        String documentNumber,
+        BigDecimal creditLimit
+
 ) {}

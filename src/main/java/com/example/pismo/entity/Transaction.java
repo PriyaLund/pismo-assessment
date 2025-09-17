@@ -46,8 +46,4 @@ public class Transaction {
     public BigDecimal getAmount() {
         return amount;
     }
-
-    public OffsetDateTime getEventDate() {
-        return eventDate;
-    }
 }

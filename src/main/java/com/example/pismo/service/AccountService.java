@@ -24,7 +24,7 @@ public class AccountService {
                             "Account already exists for document " + req.documentNumber());
                 });
 
-        Account a = new Account(req.documentNumber());
+        Account a = new Account(req.documentNumber(), req.creditLimit());
         accountRepo.save(a);
         return toResponse(a);
     }
@@ -37,6 +37,6 @@ public class AccountService {
     }
 
     private AccountResponse toResponse(Account a) {
-        return new AccountResponse(a.getId(), a.getDocumentNumber());
+        return new AccountResponse(a.getId(), a.getDocumentNumber(), a.getCreditLimit());
     }
 }

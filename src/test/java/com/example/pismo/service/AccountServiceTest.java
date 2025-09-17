@@ -31,9 +31,10 @@ class AccountServiceTest {
     void givenNewAccount_whenCreate_thenAvailableBalanceIsZero() {
         // Given
         String doc = "12345678900";
+        BigDecimal creditLimit = new BigDecimal("1000");
 
         // When
-        AccountResponse res = accountService.create(new AccountCreateRequest(doc));
+        AccountResponse res = accountService.create(new AccountCreateRequest(doc, creditLimit));
 
         // Then
         assertNotNull(res.accountId());
@@ -50,9 +51,10 @@ class AccountServiceTest {
     void givenNewDocumentNumber_whenCreateAccount_thenAccountIsPersisted() {
         // Given
         String documentNumber = "12345678900";
+        BigDecimal creditLimit = new BigDecimal("1000");
 
         // When
-        AccountResponse response = accountService.create(new AccountCreateRequest(documentNumber));
+        AccountResponse response = accountService.create(new AccountCreateRequest(documentNumber, creditLimit));
 
         // Then
         assertNotNull(response.accountId());
@@ -66,11 +68,12 @@ class AccountServiceTest {
     void givenExistingDocumentNumber_whenCreateAccount_thenThrowsBusinessException() {
         // Given
         String documentNumber = "99999999999";
-        accountService.create(new AccountCreateRequest(documentNumber));
+        BigDecimal creditLimit = new BigDecimal("1000");
+        accountService.create(new AccountCreateRequest(documentNumber, creditLimit));
 
         // When + Then
         BusinessException ex = assertThrows(BusinessException.class,
-                () -> accountService.create(new AccountCreateRequest(documentNumber)));
+                () -> accountService.create(new AccountCreateRequest(documentNumber, creditLimit)));
 
         assertTrue(ex.getMessage().contains("already exists"));
     }
@@ -78,7 +81,7 @@ class AccountServiceTest {
     @Test
     void givenExistingAccountId_whenGetAccount_thenReturnsAccountResponse() {
         // Given
-        Account saved = accountRepo.save(new Account("55544433322"));
+        Account saved = accountRepo.save(new Account("55544433322", new BigDecimal("1000")));
 
         // When
         AccountResponse response = accountService.get(saved.getId());

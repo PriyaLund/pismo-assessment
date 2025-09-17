@@ -44,7 +44,7 @@ class ApiWebTest {
     @DisplayName("Given a valid document number, when creating an account, then response has id + document_number only")
     void givenValidDocument_whenCreateAccount_thenReturnsMinimalAccount() throws Exception {
         // Given
-        var req = new AccountCreateRequest("12345678900");
+        var req = new AccountCreateRequest("12345678900", new BigDecimal("1000"));
 
         // When / Then
         mockMvc.perform(post("/accounts")
@@ -116,7 +116,7 @@ class ApiWebTest {
         var res = mockMvc.perform(post("/accounts")
                         .with(httpBasic(USER, PASSWORD))
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(om.writeValueAsString(new AccountCreateRequest(documentNumber))))
+                        .content(om.writeValueAsString(new AccountCreateRequest(documentNumber, new BigDecimal("1000")))))
                 .andExpect(status().isCreated())
                 .andReturn();
 

@@ -30,13 +30,31 @@ public class TransactionService {
                 .orElseThrow(() -> new BusinessException("ACCOUNT_NOT_FOUND", "Account not found"));
 
         int opId = validateOperationType(req.operationTypeId());
+
+        if (req.amount() == null || req.amount().signum() <= 0) {
+            throw new BusinessException("INVALID_AMOUNT", "Amount must be > 0");
+        }
+
+        // normalize: opId 4 (payment) => +amount, others => -amount
         BigDecimal signedAmount = normalizeAmountSign(opId, req.amount());
 
-        // Persist transaction with signed amount
+        // --- validate against limit BEFORE mutating state ---
+        if (opId != 4) { // debit operations only
+            BigDecimal available = account.getAvailableBalance().add(account.getCreditLimit());
+            // compare using the positive magnitude of the debit
+            BigDecimal debit = req.amount().abs();
+            if (debit.compareTo(available) > 0) {
+                throw new BusinessException(
+                        "TOTAL_LIMIT_EXCEEDED",
+                        "Transaction amount exceeds available limit"
+                );
+            }
+        }
+
+        // persist and apply
         Transaction tx = new Transaction(account, opId, signedAmount);
         txRepo.save(tx);
 
-        // Update account balance: add signed amount
         account.addToBalance(signedAmount);
         accountRepo.save(account);
 
