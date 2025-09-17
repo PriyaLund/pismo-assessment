@@ -7,6 +7,8 @@ import com.example.pismo.entity.Transaction;
 import com.example.pismo.exception.BusinessException;
 import com.example.pismo.repository.AccountRepository;
 import com.example.pismo.repository.TransactionRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,5 +57,22 @@ public class TransactionService {
         if (amount == null) throw new BusinessException("INVALID_AMOUNT", "Amount is required");
         BigDecimal abs = amount.abs();
         return (opId == 4) ? abs : abs.negate();
+    }
+
+    @Transactional(readOnly = true)
+    public TransactionResponse get(Long id) {
+        Transaction tx = txRepo.findById(id)
+                .orElseThrow(() -> new BusinessException("TRANSACTION_NOT_FOUND", "Transaction not found: " + id));
+        return toResponse(tx);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<TransactionResponse> findByAccount(Long accountId, Pageable pageable) {
+        return txRepo.findByAccountId(accountId, pageable)
+                .map(this::toResponse);
+    }
+
+    private TransactionResponse toResponse(Transaction tx) {
+        return new TransactionResponse(tx.getId(), tx.getAccount().getId(), tx.getOperationTypeId(), tx.getAmount());
     }
 }
